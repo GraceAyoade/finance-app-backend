@@ -1,5 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
-import { IExpense, IIncome } from "../types/types";
+import {IIncome } from "../types/types";
+import IncomeCategory from "./categories/incomeCat.models";
 
 export const incomeSchema = new Schema<IIncome>(
   {
@@ -16,27 +17,13 @@ export const incomeSchema = new Schema<IIncome>(
       type: String,
       required: false,
     },
-  },
-  { timestamps: true }
-);
-export const Income = mongoose.model<IIncome>("income", incomeSchema);
-
-export const expensesSchema = new Schema<IExpense>(
-  {
-    user: {
+    category: {
       type: Types.ObjectId,
-      required: true,
-      ref: "User",
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: false,
+      ref: IncomeCategory
     },
   },
   { timestamps: true }
 );
-export const Expense = mongoose.model<IExpense>("Expense", expensesSchema);
+const Income = mongoose.model<IIncome>("income", incomeSchema);
+export default Income;
+

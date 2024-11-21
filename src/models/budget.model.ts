@@ -1,12 +1,15 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { IBudget } from "../types/types";
 
 export const budgetSchema = new Schema<IBudget>(
   {
     category: {
+      type: Types.ObjectId,
+      ref: "BudgetCategory",
+      required: true,
+    },
+    description: {
       type: String,
-      default: "savings",
-      enum: ["savings", "transportation", "food", "miscellaneous"],
     },
     spent: {
       type: Number,
@@ -15,6 +18,9 @@ export const budgetSchema = new Schema<IBudget>(
     limit: {
       type: Number,
       required: true,
+    },
+    percentage: {
+      type: Number,
     },
   },
   { timestamps: true }

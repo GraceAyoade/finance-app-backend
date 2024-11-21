@@ -1,10 +1,9 @@
-import { Request, Response, NextFunction, query } from "express";
-
+import { Request, Response, NextFunction } from "express";
 import User from "../models/user.model";
-import Income from "../models/income.model";
+import Expense from "../models/expenses.models";
 import ErrorResponse from "../utils/errorResponse.utils";
 
-export const logIncome = async (
+export const logExpense = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -12,10 +11,10 @@ export const logIncome = async (
   try {
     const user = await User.findById(req.body.userId);
     if (!user) {
-      return next(new ErrorResponse("User not found", 404));
+      return next(new ErrorResponse("income unavailable!", 404));
     }
     const { description, amount, date } = req.body;
-    let newIncome = new Income({
+    let newIncome = new Expense({
       description,
       amount,
       date,
@@ -27,16 +26,12 @@ export const logIncome = async (
       message: "Income saved successfully",
       data: newIncome,
     });
-    if(!newIncome){
-      return next(new ErrorResponse("Failed to save income", 500));
-    }
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
 
-export const listIncomes = async (
+export const listExpenses = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -49,63 +44,63 @@ export const listIncomes = async (
       query.createdAt = { $gte: Date };
     }
     if (category) {
-      query.category = { $gte: category };
+      query.category = category;
     }
     if (amount) {
       query.amount = { $gte: amount };
     }
-    const incomes = await Income.find(query).sort({ createdAt: -1 });
-    res
-      .status(200)
-      .json({
-        error: false,
-        message: "Incomes retrieved successfully!",
-        data: incomes,
-      });
-    if (!incomes) {
-      return next(new ErrorResponse("not found!", 500));
-    }
-  } catch (error) {
-    next();
-  }
-};
-
-export const editIncome = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const edit = await Income.findByIdAndUpdate(id, req.body, { new: true });
-    res.status(200).json({error: false, message:"Income updated successfully", data:edit});
-    if(!id){
-      return next(new ErrorResponse("cannot edit this field!", 500));
+    const expenses = await Expense.find(query).sort({ createdAt: -1 });
+    res.status(200).json({
+      error: false,
+      message: "expenses fetched successfully",
+      data: expenses,
+    });
+    if (!expenses) {
+      return next(new ErrorResponse("No expenses found!", 404));
     }
   } catch (error) {
     next(error);
   }
 };
 
-export const deleteIncome = async (
+export const editExpense = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const edit = await Expense.findByIdAndUpdate(id, req.body, { new: true });
+    res
+      .status(200)
+      .json({
+        error: false,
+        message: "expense updated successfully!",
+        data: edit,
+      });
+    if (!edit) {
+      return next(new ErrorResponse("No expense found for update!", 404));
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteExpense = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const incomeList = await Income.findById(id);
-    if (!incomeList) {
-      return next(new ErrorResponse("Note not found!", 400));
+    const expenseList = await Expense.findById(id);
+    if (!expenseList) {
+      return next(new ErrorResponse("expense not found!", 404));
     }
-    await Income.deleteOne({ _id: id });
+    await Expense.deleteOne({ _id: id });
     res
       .status(200)
-      .json({
-        error: false,
-        message: "income successfully deleted",
-        data: null,
-      });
+      .json({ error: false, message: "Expense deleted successfully!" });
   } catch (error) {
     res.status(500).json({ message: "server error" });
     console.log(error);

@@ -17,8 +17,14 @@ export interface IIncome extends Document {
   user: ObjectId;
   amount: number;
   description?: string;
+  category?: ObjectId;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IIncomeCategory extends Document {
+  title: string;
+  description: string;
 }
 
 export interface IExpense extends Document {
@@ -30,17 +36,18 @@ export interface IExpense extends Document {
 }
 
 export interface IBudget extends Document {
-  category: string;
+  category: ObjectId;
   limit: number;
+  description: string;
   spent: number;
+  percentage: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface ICategoryBreakdown extends Document {
-  category: string;
-  amountSpent: number;
-  percentage: number;
+export interface IBudgetCategory extends Document {
+  title: string;
+  description: string;
 }
 
 export interface IReport extends Document {
