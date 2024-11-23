@@ -1,7 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose, {Schema, Types} from 'mongoose';
+import { IEntry } from '../types/types';
 
-const EntrySchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+const EntrySchema = new Schema<IEntry>({
+  userId: { type: Types.ObjectId, ref: 'User', required: true },
   type: { type: String, enum: ['income', 'expense'], required: true },
   date: { type: Date, required: true },
   amount: { type: Number, required: true },

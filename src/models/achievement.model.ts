@@ -1,9 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
+import { IAchievement } from "../types/types";
 
-const AchievementSchema = new mongoose.Schema(
+const AchievementSchema = new Schema<IAchievement>(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "User",
       required: true,
     },
@@ -13,5 +14,5 @@ const AchievementSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Achievement = mongoose.model("Achievement", AchievementSchema);
+const Achievement = mongoose.model<IAchievement>("Achievement", AchievementSchema);
 export default Achievement;

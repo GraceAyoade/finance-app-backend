@@ -1,12 +1,13 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+import colors from "colors";
 
-const connectDB = async () => {
+// connecting to Database
+const connectDB = async (): Promise<void> => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || '');
-    console.log('MongoDB connected successfully');
-  } catch (err) {
-    console.error('MongoDB connection failed:', err);
-    process.exit(1);
+    await mongoose.connect(process.env.MONGODB_URL as string);
+    console.log(colors.cyan.bold.underline("MongoDB connected successfully"));
+  } catch (error) {
+    console.log(colors.red.bold.underline("Error! connection failed!"));
   }
 };
 

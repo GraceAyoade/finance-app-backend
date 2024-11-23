@@ -1,32 +1,53 @@
-import bcrypt from 'bcrypt';
-import { Request, Response } from 'express';
+import bcrypt from "bcrypt";
+import { NextFunction, Request, Response } from "express";
+import { generateToken } from "../utils/jwtUtils";
+import User from "../models/user.model";
+import userMapper from "../mappers/userMapper";
+import ErrorResponse from "../utils/errorResponse.utils";
 
-import { generateToken } from '../utils/jwtUtils';
-import User from '../models/user.model';
-
-export const signUp = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+export const signUp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { firstName, lastName, email, password, nationality } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password: hashedPassword });
-    res.status(201).json({ message: 'User registered successfully', user });
-  } catch (err) {
-    res.status(400).json({ message: 'Error registering user', error: err });
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+      nationality,
+    });
+    if (!user) {
+      return next(new ErrorResponse("Error registering user", 404));
+    }
+    res.status(201).json({
+      error: false,
+      message: "User registered successfully",
+      data: null,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const logIn = async (req: Request, res: Response): Promise<any> => {
+export const logIn = async (req: Request, res: Response, next:NextFunction) :Promise<any> => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
+    if (!user){
+      return next(new ErrorResponse('User not found!', 404))
+    } 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-
+    if (!isMatch){
+      return next(new ErrorResponse('invalid credentials', 404))
+    }
     const token = generateToken(user._id);
-    res.status(200).json({ message: 'Login successful', token });
-  } catch (err) {
-    res.status(500).json({ message: 'Error logging in', error: err });
+    res.status(200).json({ error: false, message: "Login successful", data: {authToken: token, user: userMapper(user) }});
+    return next(new ErrorResponse('Error logging in', 404));
+  } catch (error) {
+   next(error)
   }
-};
+}; 

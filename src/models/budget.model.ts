@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
+import { IBudget } from '../types/types';
 
-const BudgetSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+const BudgetSchema = new Schema<IBudget>({
+  userId: { type: Types.ObjectId, ref: 'User', required: true },
   category: { type: String },
   amount: { type: Number, required: true },
 }, { timestamps: true });
 
-const Budget = mongoose.model('Budget', BudgetSchema);
+const Budget = mongoose.model<IBudget>('Budget', BudgetSchema);
 export default Budget

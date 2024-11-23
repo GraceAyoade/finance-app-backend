@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import Budget from '../models/budget.model';
 
-
 export const setBudget = async (req: Request, res: Response) => {
   const { category, amount } = req.body;
   const userId = req.user.id;
