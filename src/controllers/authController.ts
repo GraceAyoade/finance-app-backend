@@ -46,8 +46,7 @@ export const logIn = async (req: Request, res: Response, next:NextFunction) :Pro
     }
     const token = generateToken(user._id);
     res.status(200).json({ error: false, message: "Login successful", data: {authToken: token, user: userMapper(user) }});
-    return next(new ErrorResponse('Error logging in', 404));
   } catch (error) {
-   next(error)
+   next(new ErrorResponse ("Error logging in!", 404))
   }
 }; 

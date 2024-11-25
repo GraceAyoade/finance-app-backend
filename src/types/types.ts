@@ -22,7 +22,9 @@ export interface IEntry extends Document{
 export interface IBudget extends Document{
     userId: ObjectId,
     category: string,
-    amount: number
+    amount: number,
+    date: Date,
+    endDate: Date
 }
 
 export interface IAchievement extends Document{
