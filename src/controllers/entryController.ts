@@ -17,6 +17,7 @@ export const logEntry = async (
   if (!type || !date || !amount || !category || !description) {
     return next(new ErrorResponse("All fields are required!", 400));
   }
+    
   try {
     const entry = await Entry.create({
       userId,
