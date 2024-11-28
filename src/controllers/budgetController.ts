@@ -7,17 +7,34 @@ export const setBudget = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { category, amount } = req.body;
+  const { category, amount, startDate, endDate } = req.body;
   const userId = req.user?.id;
   if (!userId) {
     return next(new ErrorResponse("User not found!", 404));
   }
+
+    // Validate startDate and endDate
+    if (!startDate || !endDate) {
+      return next(new ErrorResponse("Start date and end date are required!", 400));
+    }
+  
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+  
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return next(new ErrorResponse("Invalid date format!", 400));
+    }
+  
+    if (start >= end) {
+      return next(new ErrorResponse("Start date must be before end date!", 400));
+    }
+
   try {
     const budget = await Budget.findOneAndUpdate(
       { userId, category },
-      { amount },
+      { amount, startDate: start, endDate: end },
       { new: true, upsert: true }
-    );
+    ).sort({ createdAt: -1 });
     res
       .status(200)
       .json({ error: false, message: "Budget set successfully", data: budget });

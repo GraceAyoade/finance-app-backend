@@ -17,20 +17,23 @@ export const logEntry = async (
   if (!type || !date || !amount || !category || !description) {
     return next(new ErrorResponse("All fields are required!", 400));
   }
-    
+  // Convert type to lowercase
+  const normalizedType = type.toLowerCase();
   try {
     const entry = await Entry.create({
       userId,
-      type,
+      type: normalizedType,
       date,
       amount,
       category,
       description,
-    });
+      createdAt: new Date()
+    })
+    const sortedEntries = await Entry.find({ userId }).sort({ createdAt: 1 });
     res.status(201).json({
       error: false,
       message: "Entry logged successfully",
-      data: entry,
+      data: {entry, sortedEntries}
     });
   } catch (error) {
     next(error);
@@ -121,13 +124,11 @@ export const deleteEntry = async (
   try {
     const deletedEntry = await Entry.findByIdAndDelete(entryId);
     if (!deletedEntry) return next(new ErrorResponse("Entry not found!", 404));
-    res
-      .status(200)
-      .json({
-        error: false,
-        message: "Entry deleted successfully",
-        data: null,
-      });
+    res.status(200).json({
+      error: false,
+      message: "Entry deleted successfully",
+      data: null,
+    });
   } catch (error) {
     next(new ErrorResponse("Error deleting entry!", 500));
   }
@@ -143,13 +144,11 @@ export const deleteEntries = async (
     const deletedEntries = await Entry.deleteMany({ userId });
     if (deletedEntries.deletedCount === 0)
       return next(new ErrorResponse("No entries found for this user!", 404));
-    res
-      .status(200)
-      .json({
-        error: false,
-        message: "All entries deleted successfully",
-        data: null,
-      });
+    res.status(200).json({
+      error: false,
+      message: "All entries deleted successfully",
+      data: null,
+    });
   } catch (error) {
     next(new ErrorResponse("Error deleting entries!", 500));
   }
